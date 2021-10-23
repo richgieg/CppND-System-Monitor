@@ -14,7 +14,7 @@ string Format::ElapsedTime(long seconds) {
   seconds -= hours * secondsPerHour;
   minutes = seconds / secondsPerMinute;
   seconds -= minutes * secondsPerMinute;
-  std::stringstream sstream;
+  std::ostringstream sstream;
   sstream << std::setfill('0')
     << std::setw(2) << hours << ":"
     << std::setw(2) << minutes << ":"

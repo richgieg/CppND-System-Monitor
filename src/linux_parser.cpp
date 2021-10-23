@@ -69,7 +69,6 @@ vector<int> LinuxParser::Pids() {
 // TODO: Read and return the system memory utilization
 float LinuxParser::MemoryUtilization() { return 0.0; }
 
-// TODO: Read and return the system uptime
 long LinuxParser::UpTime() {
   long uptimeSeconds = 0;
   std::ifstream stream(kProcDirectory + kUptimeFilename);
