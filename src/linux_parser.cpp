@@ -11,6 +11,10 @@ using std::string;
 using std::to_string;
 using std::vector;
 
+// Helper function that reads the first integer after the
+// given key from the given file.
+int ReadFirstIntegerAfterKeyFromFile(string key, string file);
+
 // DONE: An example of how to read data from the filesystem
 string LinuxParser::OperatingSystem() {
   string line;
@@ -66,8 +70,15 @@ vector<int> LinuxParser::Pids() {
   return pids;
 }
 
-// TODO: Read and return the system memory utilization
-float LinuxParser::MemoryUtilization() { return 0.0; }
+float LinuxParser::MemoryUtilization() {
+  int memTotal = ReadFirstIntegerAfterKeyFromFile("MemTotal:", kProcDirectory + kMeminfoFilename);
+  int memFree = ReadFirstIntegerAfterKeyFromFile("MemFree:", kProcDirectory + kMeminfoFilename);
+  int memUsed = memTotal - memFree;
+  // Cast at least one operand to float so that fractional part of
+  // quotient isn't truncated.
+  float memUtilization = static_cast<float>(memUsed) / memTotal;
+  return memUtilization;
+}
 
 long LinuxParser::UpTime() {
   long uptimeSeconds = 0;
@@ -94,31 +105,12 @@ long LinuxParser::IdleJiffies() { return 0; }
 // TODO: Read and return CPU utilization
 vector<string> LinuxParser::CpuUtilization() { return {}; }
 
-int ReadFirstIntegerAfterKeyFromStatFile(string key) {
-  int firstInteger = 0;
-  std::ifstream filestream(LinuxParser::kProcDirectory + LinuxParser::kStatFilename);
-  if (filestream.is_open()) {
-    string line;
-    while (std::getline(filestream, line)) {
-      std::istringstream linestream(line);
-      string lineKey;
-      int value;
-      linestream >> lineKey >> value;
-      if (lineKey == key) {
-        firstInteger = value;
-        break;
-      }
-    }
-  }
-  return firstInteger;
-}
-
 int LinuxParser::TotalProcesses() {
-  return ReadFirstIntegerAfterKeyFromStatFile("processes");
+  return ReadFirstIntegerAfterKeyFromFile("processes", kProcDirectory + kStatFilename);
 }
 
 int LinuxParser::RunningProcesses() {
-  return ReadFirstIntegerAfterKeyFromStatFile("procs_running");
+  return ReadFirstIntegerAfterKeyFromFile("procs_running", kProcDirectory + kStatFilename);
 }
 
 // TODO: Read and return the command associated with a process
@@ -140,3 +132,22 @@ string LinuxParser::User(int pid[[maybe_unused]]) { return string(); }
 // TODO: Read and return the uptime of a process
 // REMOVE: [[maybe_unused]] once you define the function
 long LinuxParser::UpTime(int pid[[maybe_unused]]) { return 0; }
+
+int ReadFirstIntegerAfterKeyFromFile(string key, string file) {
+  int firstInteger = 0;
+  std::ifstream filestream(file);
+  if (filestream.is_open()) {
+    string line;
+    while (std::getline(filestream, line)) {
+      std::istringstream linestream(line);
+      string lineKey;
+      int value;
+      linestream >> lineKey >> value;
+      if (lineKey == key) {
+        firstInteger = value;
+        break;
+      }
+    }
+  }
+  return firstInteger;
+}

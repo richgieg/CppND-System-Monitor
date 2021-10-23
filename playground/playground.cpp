@@ -8,10 +8,11 @@ using std::string;
 
 string GetKernel();
 string GetKernel2();
+float MemoryUtilization();
+int ReadFirstIntegerAfterKeyFromFile(string key, string file);
 
 int main() {
-  string kernel_version = GetKernel2();
-  std::cout << kernel_version << "\n";
+  std::cout << MemoryUtilization() << "\n";
 }
 
 string GetKernel() {
@@ -34,4 +35,33 @@ string GetKernel2() {
     stream >> os >> version >> kernel;
   }
   return kernel;
+}
+
+float MemoryUtilization() {
+  int memTotal = ReadFirstIntegerAfterKeyFromFile("MemTotal:", "/proc/meminfo");
+  int memFree = ReadFirstIntegerAfterKeyFromFile("MemFree:", "/proc/meminfo");
+  int memUsed = memTotal - memFree;
+  float memUtilizationPercent = static_cast<float>(memUsed) / memTotal * 100;
+  return memUtilizationPercent;
+}
+
+int ReadFirstIntegerAfterKeyFromFile(string key, string file) {
+  int firstInteger = 0;
+  std::ifstream filestream(file);
+  if (filestream.is_open()) {
+    string line;
+    while (std::getline(filestream, line)) {
+      std::cout << line << "\n";
+      std::istringstream linestream(line);
+      string lineKey;
+      int value;
+      linestream >> lineKey >> value;
+      if (lineKey == key) {
+        std::cout << value << "\n";
+        firstInteger = value;
+        break;
+      }
+    }
+  }
+  return firstInteger;
 }
