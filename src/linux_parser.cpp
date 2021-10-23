@@ -11,9 +11,13 @@ using std::string;
 using std::to_string;
 using std::vector;
 
-// Helper function that reads the first integer after the
-// given key from the given file.
+// Internal helper function that reads the first integer after
+// the given key from the given file.
 int ReadFirstIntegerAfterKeyFromFile(string key, string file);
+
+// Internal helper function that reads CPU time info (jiffies)
+// from the stat file.
+LinuxParser::CpuTimeInfo ReadCpuTimeInfoFromStatFile();
 
 // DONE: An example of how to read data from the filesystem
 string LinuxParser::OperatingSystem() {
@@ -89,21 +93,33 @@ long LinuxParser::UpTime() {
   return uptimeSeconds;
 }
 
-// TODO: Read and return the number of jiffies for the system
-long LinuxParser::Jiffies() { return 0; }
+long LinuxParser::Jiffies() {
+  return ActiveJiffies() + IdleJiffies();
+}
 
 // TODO: Read and return the number of active jiffies for a PID
 // REMOVE: [[maybe_unused]] once you define the function
 long LinuxParser::ActiveJiffies(int pid[[maybe_unused]]) { return 0; }
 
-// TODO: Read and return the number of active jiffies for the system
-long LinuxParser::ActiveJiffies() { return 0; }
+long LinuxParser::ActiveJiffies() {
+  auto cpuTimeInfo = ReadCpuTimeInfoFromStatFile();
+  return cpuTimeInfo.user + cpuTimeInfo.nice + cpuTimeInfo.system
+    + cpuTimeInfo.irq + cpuTimeInfo.softirq;
+}
 
-// TODO: Read and return the number of idle jiffies for the system
-long LinuxParser::IdleJiffies() { return 0; }
+long LinuxParser::IdleJiffies() {
+  auto cpuTimeInfo = ReadCpuTimeInfoFromStatFile();
+  return cpuTimeInfo.idle;
+}
 
-// TODO: Read and return CPU utilization
-vector<string> LinuxParser::CpuUtilization() { return {}; }
+float LinuxParser::CpuUtilization() {
+  auto totalJiffies = Jiffies();
+  auto activeJiffies = ActiveJiffies();
+  // Cast at least one operand to float so that fractional part of
+  // quotient isn't truncated.
+  float cpuUtilization = static_cast<float>(activeJiffies) / totalJiffies;
+  return cpuUtilization;
+}
 
 int LinuxParser::TotalProcesses() {
   return ReadFirstIntegerAfterKeyFromFile("processes", kProcDirectory + kStatFilename);
@@ -150,4 +166,31 @@ int ReadFirstIntegerAfterKeyFromFile(string key, string file) {
     }
   }
   return firstInteger;
+}
+
+LinuxParser::CpuTimeInfo ReadCpuTimeInfoFromStatFile() {
+  LinuxParser::CpuTimeInfo cpuTimeInfo = {};
+  std::ifstream filestream(LinuxParser::kProcDirectory + LinuxParser::kStatFilename);
+  if (filestream.is_open()) {
+    string line;
+    while (std::getline(filestream, line)) {
+      std::istringstream linestream(line);
+      string key;
+      linestream >> key;
+      if (key == "cpu") {
+        linestream >> cpuTimeInfo.user;
+        linestream >> cpuTimeInfo.nice;
+        linestream >> cpuTimeInfo.system;
+        linestream >> cpuTimeInfo.idle;
+        linestream >> cpuTimeInfo.iowait;
+        linestream >> cpuTimeInfo.irq;
+        linestream >> cpuTimeInfo.softirq;
+        linestream >> cpuTimeInfo.steal;
+        linestream >> cpuTimeInfo.guest;
+        linestream >> cpuTimeInfo.guest_nice;
+        break;
+      }
+    }
+  }
+  return cpuTimeInfo;
 }

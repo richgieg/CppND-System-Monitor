@@ -27,20 +27,39 @@ int RunningProcesses();
 std::string OperatingSystem();
 std::string Kernel();
 
-// CPU
-enum CPUStates {
-  kUser_ = 0,
-  kNice_,
-  kSystem_,
-  kIdle_,
-  kIOwait_,
-  kIRQ_,
-  kSoftIRQ_,
-  kSteal_,
-  kGuest_,
-  kGuestNice_
+// CPU Time Info (jiffies).
+struct CpuTimeInfo {
+  // Time spent in user mode.
+  long user;
+  // Time spent in user mode with low priority (nice).
+  long nice;
+  // Time spent in system mode.
+  long system;
+  // Time spent in the idle task. This value should be
+  // USER_HZ times the second entry in the /proc/uptime
+  // pseudo-file.
+  long idle;
+  // Time waiting for I/O to complete (not reliable!).
+  long iowait;
+  // Time servicing interrupts (since Linux 2.6.0).
+  long irq;
+  // Time servicing softirqs (since Linux 2.6.0).
+  long softirq;
+  // Stolen time, which is the time spent in other
+  // operating systems when running in a virtualized
+  // environment (since Linux 2.6.11).
+  long steal;
+  // Time spent running a virtual CPU for guest operating
+  // systems under the control of the Linux kernel
+  // (since Linux 2.6.24).
+  long guest;
+  // Time spent running a niced guest (virtual CPU for
+  // guest operating systems under the control of the Linux
+  // kernel) (since Linux 2.6.33).
+  long guest_nice;
 };
-std::vector<std::string> CpuUtilization();
+
+float CpuUtilization();
 long Jiffies();
 long ActiveJiffies();
 long ActiveJiffies(int pid);
