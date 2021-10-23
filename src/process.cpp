@@ -11,14 +11,16 @@ using std::string;
 using std::to_string;
 using std::vector;
 
-Process::Process(int pid) :pid_{pid} {}
+Process::Process(int pid)
+  :pid_{pid},
+  command_{LinuxParser::Command(pid)} {}
 
 int Process::Pid() { return pid_; }
 
 // TODO: Return this process's CPU utilization
 float Process::CpuUtilization() { return 0; }
 
-string Process::Command() { return LinuxParser::Command(pid_); }
+string Process::Command() { return command_; }
 
 // TODO: Return this process's memory utilization
 string Process::Ram() { return string(); }
