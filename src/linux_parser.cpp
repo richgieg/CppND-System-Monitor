@@ -19,7 +19,6 @@ int ReadFirstIntegerAfterKeyFromFile(string key, string file);
 // from the stat file.
 LinuxParser::CpuTimeInfo ReadCpuTimeInfoFromStatFile();
 
-// DONE: An example of how to read data from the filesystem
 string LinuxParser::OperatingSystem() {
   string line;
   string key;
@@ -42,7 +41,6 @@ string LinuxParser::OperatingSystem() {
   return value;
 }
 
-// DONE: An example of how to read data from the filesystem
 // MODIFIED: Read strings directly from ifstream rather than
 // creating an unnecessary istringstream instance.
 string LinuxParser::Kernel() {
@@ -138,9 +136,12 @@ string LinuxParser::Command(int pid) {
   return command;
 }
 
-// TODO: Read and return the memory used by a process
-// REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Ram(int pid) { return string(); }
+string LinuxParser::Ram(int pid) {
+  constexpr int kilobytesPerMegabyte = 1024;
+  int vmSize = ReadFirstIntegerAfterKeyFromFile("VmSize:", kProcDirectory + to_string(pid) + kStatusFilename);
+  int megabytesUsed = vmSize / kilobytesPerMegabyte;
+  return to_string(megabytesUsed);
+}
 
 string LinuxParser::Uid(int pid) {
   return to_string(ReadFirstIntegerAfterKeyFromFile("Uid:", kProcDirectory + to_string(pid) + kStatusFilename));
