@@ -25,6 +25,7 @@ vector<Process>& System::Processes() {
     processes_.emplace_back(pid);
   }
   std::sort(processes_.begin(), processes_.end());
+  std::reverse(processes_.begin(), processes_.end()); // descending order
   return processes_;
 }
 
