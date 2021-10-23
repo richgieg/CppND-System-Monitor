@@ -28,6 +28,7 @@ std::string OperatingSystem();
 std::string Kernel();
 
 // CPU Time Info (jiffies).
+// https://man7.org/linux/man-pages/man5/proc.5.html
 struct CpuTimeInfo {
   // Time spent in user mode.
   long user;
