@@ -200,16 +200,11 @@ LinuxParser::CpuTimeInfo ReadCpuTimeInfoFromStatFile() {
       string key;
       linestream >> key;
       if (key == "cpu") {
-        linestream >> cpuTimeInfo.user;
-        linestream >> cpuTimeInfo.nice;
-        linestream >> cpuTimeInfo.system;
-        linestream >> cpuTimeInfo.idle;
-        linestream >> cpuTimeInfo.iowait;
-        linestream >> cpuTimeInfo.irq;
-        linestream >> cpuTimeInfo.softirq;
-        linestream >> cpuTimeInfo.steal;
-        linestream >> cpuTimeInfo.guest;
-        linestream >> cpuTimeInfo.guest_nice;
+        linestream >> cpuTimeInfo.user >> cpuTimeInfo.nice
+          >> cpuTimeInfo.system >> cpuTimeInfo.idle
+          >> cpuTimeInfo.iowait >> cpuTimeInfo.irq
+          >> cpuTimeInfo.softirq >> cpuTimeInfo.steal
+          >> cpuTimeInfo.guest >> cpuTimeInfo.guest_nice;
         break;
       }
     }
