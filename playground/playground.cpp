@@ -3,15 +3,15 @@
 #include <fstream>
 #include <sstream>
 
-std::string GetKernelVersion();
-std::string GetKernelVersion2();
+std::string GetKernel();
+std::string GetKernel2();
 
 int main() {
-    std::string kernel_version = GetKernelVersion2();
+    std::string kernel_version = GetKernel2();
     std::cout << kernel_version << "\n";
 }
 
-std::string GetKernelVersion() {
+std::string GetKernel() {
     std::string os, kernel, version;
     std::string line;
     std::ifstream stream("/proc/version");
@@ -23,7 +23,7 @@ std::string GetKernelVersion() {
     return kernel;
 }
 
-std::string GetKernelVersion2() {
+std::string GetKernel2() {
     std::string os, kernel, version;
     std::string line;
     std::ifstream stream("/proc/version");
