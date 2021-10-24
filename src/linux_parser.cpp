@@ -153,8 +153,12 @@ string LinuxParser::Command(int pid) {
 
 string LinuxParser::Ram(int pid) {
   constexpr int kilobytesPerMegabyte = 1024;
-  int vmSize = ReadFirstIntegerAfterKeyFromFile("VmSize:", kProcDirectory + to_string(pid) + kStatusFilename);
-  int megabytesUsed = vmSize / kilobytesPerMegabyte;
+  // Using VmRSS, rather than VmSize, since it gives the exact physical
+  // memory being used as a part of Physical RAM. VmSize is actually the
+  // sum of all the virtual memory and can result in a value larger than
+  // the system's physical RAM size.
+  int vmRSS = ReadFirstIntegerAfterKeyFromFile("VmRSS:", kProcDirectory + to_string(pid) + kStatusFilename);
+  int megabytesUsed = vmRSS / kilobytesPerMegabyte;
   return to_string(megabytesUsed);
 }
 
